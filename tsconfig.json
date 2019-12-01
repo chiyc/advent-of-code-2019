@@ -2,6 +2,10 @@
   "compilerOptions": {
       "module": "commonjs",
       "target": "es6",
+      "outDir": "./build",
+
+      "sourceMap": true,
+
       "noImplicitAny": true,
       "noImplicitThis": true,
       "noImplicitReturns": true,
@@ -12,8 +16,8 @@
       "strictFunctionTypes": true,
       "strictPropertyInitialization": true,
       "strictBindCallApply": true,
-      "removeComments": true,
-      "sourceMap": true
+
+      "removeComments": true
   },
   "include": [
     "src/*"
