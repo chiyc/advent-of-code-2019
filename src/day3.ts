@@ -28,6 +28,10 @@ enum WirePositionState {
   B,
   Intersected,
 }
+
+interface WireMap {
+  [position: string]: WireMapPosition
+}
 interface WireMapPosition {
   state: WirePositionState;
   distance: number;
@@ -53,12 +57,12 @@ function setWireMapValue(currentPosition: WireMapPosition | undefined, currentPo
   if (currentPosition === undefined) {
     state = wireName === Wire.A ? WirePositionState.A : WirePositionState.B;
     distance = currentPositionDistance;
-  } else if (currentPosition !== undefined && currentPosition.state === WirePositionState.A && wireName === Wire.B) {
-    state = WirePositionState.Intersected;
-    distance = currentPosition.distance + currentPositionDistance;
-  } else if (currentPosition !== undefined && currentPosition.state === WirePositionState.A) {
+  } else if (currentPosition.state === WirePositionState.A && wireName === Wire.A) {
     state = WirePositionState.A;
     distance = currentPosition.distance;
+  } else if (currentPosition.state === WirePositionState.A) {
+    state = WirePositionState.Intersected;
+    distance = currentPosition.distance + currentPositionDistance;
   } else {
     state = WirePositionState.B;
     distance = currentPosition.distance;
@@ -70,7 +74,7 @@ function setWireMapValue(currentPosition: WireMapPosition | undefined, currentPo
   };
 }
 
-function getWireMap(wireSegments: Segment[], position: Point, distance: number, wireMap: {[key: string]: WireMapPosition}, wireName: Wire): {[key: string]: WireMapPosition} {
+function getWireMap(wireSegments: Segment[], position: Point, distance: number, wireMap: WireMap, wireName: Wire): WireMap {
   if (wireSegments.length === 0) {
     return wireMap;
   }
