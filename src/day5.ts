@@ -44,15 +44,15 @@ function runProgramDay5(instructions: string[], position: number, input: string,
   let newPosition = position;
   let newInput = input;
   if (opCode === '01') {
-    const operandA = modes[0] === Mode.Position ? instructions[parameterA] : instructions[position+1] ;
-    const operandB = modes[1] === Mode.Position ? instructions[parameterB] : instructions[position+2] ;
+    const operandA = modes[0] === Mode.Position ? instructions[parameterA] : instructions[position+1];
+    const operandB = modes[1] === Mode.Position ? instructions[parameterB] : instructions[position+2];
     newInstructions[Number.parseInt(target)] = `${Number.parseInt(operandA) + Number.parseInt(operandB)}`;
     newPosition += 4;
   }
 
   if (opCode === '02') {
-    const operandA = modes[0] === Mode.Position ? instructions[parameterA] : instructions[position+1] ;
-    const operandB = modes[1] === Mode.Position ? instructions[parameterB] : instructions[position+2] ;
+    const operandA = modes[0] === Mode.Position ? instructions[parameterA] : instructions[position+1];
+    const operandB = modes[1] === Mode.Position ? instructions[parameterB] : instructions[position+2];
     newInstructions[Number.parseInt(target)] = `${Number.parseInt(operandA) * Number.parseInt(operandB)}`;
     newPosition += 4;
   }
@@ -68,6 +68,36 @@ function runProgramDay5(instructions: string[], position: number, input: string,
     newPosition += 2;
   }
 
+  if (opCode === '05') {
+    const jumpCondition = modes[0] === Mode.Position ? instructions[parameterA] : String(parameterA);
+    newPosition = Number.parseInt(jumpCondition) !== 0
+      ? modes[1] === Mode.Position ? Number.parseInt(instructions[parameterB]) : parameterB
+      : newPosition + 3;
+  }
+
+  if (opCode === '06') {
+    const jumpCondition = modes[0] === Mode.Position ? instructions[parameterA] : String(parameterA);
+    newPosition = Number.parseInt(jumpCondition) === 0
+      ? modes[1] === Mode.Position ? Number.parseInt(instructions[parameterB]) : parameterB
+      : newPosition + 3;
+  }
+
+  if (opCode === '07') {
+    const operandA = modes[0] === Mode.Position ? instructions[parameterA] : instructions[position+1];
+    const operandB = modes[1] === Mode.Position ? instructions[parameterB] : instructions[position+2];
+
+    newInstructions[Number.parseInt(target)] = Number.parseInt(operandA) < Number.parseInt(operandB) ? '1' : '0';
+    newPosition += 4;
+  }
+
+  if (opCode === '08') {
+    const operandA = modes[0] === Mode.Position ? instructions[parameterA] : instructions[position+1];
+    const operandB = modes[1] === Mode.Position ? instructions[parameterB] : instructions[position+2];
+
+    newInstructions[Number.parseInt(target)] = Number.parseInt(operandA) === Number.parseInt(operandB) ? '1' : '0';
+    newPosition += 4;
+  }
+
   console.log(`(${position}) [op: ${opCode}] [modes: ${modes.join('')}] ${parameterA} ${parameterB} ${position}`);
 
   return runProgramDay5(newInstructions, newPosition, newInput, outputs);
@@ -78,4 +108,5 @@ const crashInstructions5 = day5Instructions.slice();
 // crashInstructions5[1] = '12';
 // crashInstructions5[2] = '2';
 
-console.log(`Day 2 - Part 1: ${runProgramDay5(crashInstructions5, 0, '1', [])[0]}`);
+console.log(`Day 5 - Part 1: ${runProgramDay5(crashInstructions5, 0, '1', [])[0]}`); // 5044655
+console.log(`Day 5 - Part 2: ${runProgramDay5(crashInstructions5, 0, '5', [])[0]}`); // 7408802
