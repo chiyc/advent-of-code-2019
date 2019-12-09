@@ -113,14 +113,14 @@ function runAmplifierStage(instructions: string[], position: number, inputs: str
   return runAmplifierStage(newInstructions, newPosition, inputs, outputs, feedbackMode);
 }
 
-function permute(list: string[]): any {
+function permute(list: string[]): string[][] {
   if (list.length === 0) {
     return [];
   }
   let result = [];
   for (let i = 0; i < list.length; i++) {
     const rest: string[] = list.slice(0,i).concat(list.slice(i+1));
-    const restPermutations: any = permute(rest);
+    const restPermutations: string[][] = permute(rest);
     if (rest.length === 0) {
       result.push([list[i]]);
     }
