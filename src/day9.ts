@@ -16,6 +16,7 @@ enum ExitType {
 type Exit = {
   exitType: ExitType;
   lastPosition: number;
+  outputs: string[];
 };
 
 class IntCodeComputer {
@@ -27,21 +28,21 @@ class IntCodeComputer {
     this.instructions = instructions;
   }
 
-  restartSoftware(inputs: string[], feedbackMode: boolean = false) {
+  restartSoftware(inputs: string[], feedbackMode: boolean = false): Exit {
     this.position = this.relativeBase = 0;
     return this.resumeSoftware(inputs, feedbackMode);
   }
 
-  resumeSoftware(inputs: string[], feedbackMode: boolean = false) {
+  resumeSoftware(inputs: string[], feedbackMode: boolean = false): Exit {
     let outputs: string[] = [];
 
     let running = true;
-    let exit = { exitType: ExitType.Normal, lastPosition: this.position };
+    let exit = { exitType: ExitType.Normal, lastPosition: this.position, outputs };
     while (running && exit.exitType === ExitType.Normal) {
       exit = this.runInstruction(inputs, outputs, feedbackMode);
     }
 
-    return outputs;
+    return exit;
   }
 
   runInstruction(inputs: string[], outputs: string[], feedbackMode: boolean): Exit {
@@ -53,12 +54,12 @@ class IntCodeComputer {
 
     if (this.position === this.instructions.length) {
       // console.log('ending condition: ', position, instructions.length, opCode);
-      return { exitType: ExitType.LastInstruction, lastPosition: this.position };
+      return { exitType: ExitType.LastInstruction, lastPosition: this.position, outputs };
     }
 
     if (opCode === '99') {
       // console.log('ending condition: ', position, instructions.length, opCode);
-      return { exitType: ExitType.Halt, lastPosition: this.position };
+      return { exitType: ExitType.Halt, lastPosition: this.position, outputs };
     }
 
     const parameterA = Number.parseInt(this.instructions[this.position+1]);
@@ -85,7 +86,7 @@ class IntCodeComputer {
       // console.log('OPCODE 3!!!');
       if (feedbackMode && inputs.length === 0) {
         console.log('Exiting feedback due to output');
-        return { exitType: ExitType.Feedback, lastPosition: this.position };
+        return { exitType: ExitType.Feedback, lastPosition: this.position, outputs };
       }
       newInstructions[modes[0] === Mode.Position ? parameterA : parameterA+this.relativeBase] = inputs[0];
       inputs.splice(0, 1);
@@ -95,10 +96,10 @@ class IntCodeComputer {
     if (opCode === '04') { // OUTPUT
       outputs.push(modes[0] === Mode.Position ? (this.instructions[parameterA] || '0') : modes[0] === Mode.Relative ? (this.instructions[parameterA + this.relativeBase] || '0') : String(parameterA));
       newPosition += 2;
-      // if (feedbackMode) {
-      //   // console.log('Exiting feedback due to output');
-      //   return { exitType: ExitType.Feedback, lastPosition: newPosition }
-      // }
+      if (feedbackMode) {
+        // console.log('Exiting feedback due to output');
+        return { exitType: ExitType.Feedback, lastPosition: newPosition, outputs }
+      }
     }
 
     if (opCode === '05') { // JUMP IF TRUE, set this.position to operand
@@ -137,7 +138,8 @@ class IntCodeComputer {
 
     return {
       exitType: ExitType.Normal,
-      lastPosition: newPosition
+      lastPosition: newPosition,
+      outputs
     };
   }
 }
@@ -148,9 +150,9 @@ const day9Software = fs.readFileSync('input/day9.input', 'utf-8')
 
 const computer = new IntCodeComputer(day9Software);
 
-let part1Output = computer.resumeSoftware(['1']);
+let part1Output = computer.resumeSoftware(['1']).outputs;
 
 console.log(`Day 9 - Part 1: `, part1Output); // Part 1 3409270027
 
-let part2Output = computer.restartSoftware(['2']);
+let part2Output = computer.restartSoftware(['2']).outputs;
 console.log(`Day 9 - Part 2: `, part2Output); // Part 2 82760
