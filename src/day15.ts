@@ -249,11 +249,11 @@ class RepairDroidControl {
       return this.selectNextMove();
 
     }  else if (status === '2') {
-      this.oxygenPosition[0] = this.droidPosition[0];
-      this.oxygenPosition[1] = this.droidPosition[1];
       this.area[lastDroidPosition].clearDirections.push(lastMove);
       this.updateAreaMap(this.droidPosition[0], this.droidPosition[1], 'O');
       this.handleMove(lastMove);
+      this.oxygenPosition[0] = this.droidPosition[0];
+      this.oxygenPosition[1] = this.droidPosition[1];
       this.distanceToOxygen = this.area[this.droidPositionKey()].distanceFromStart;
       this.updateAreaMap(this.droidPosition[0], this.droidPosition[1], '@');
       return this.selectNextMove();
@@ -352,7 +352,7 @@ const droidSoftware = fs.readFileSync('input/day15.input', 'utf-8').trim().split
 
 const droid = new RepairDroidControl(new IntCodeComputer(droidSoftware.slice()));
 
-// droid.findOxygenSystem();
+droid.findOxygenSystem();
 // console.log('whaty dsofidsajf oi tdosesnt thits run??');
 
 droid.printAreaMap();
@@ -362,94 +362,100 @@ droid.printAreaMap();
 
 // //HOLDconsole.log(`Day 15 - Part 1: ${arcade.countBlocks()} blocks`); // 200
 let areaMap = droid.areaMap.slice();
-areaMap = [' ############### ### ########### #######',
-'#...............#...#...........#.......#',
-'#.#.###########.###.#.#.#########.#.####',
-'#.#.....#...#.#.....#.#...........#.....#',
-' ######.#.#.#.#####.#.#################.#',
-'#.......#.#...#.....#.#.....#.........#.#',
-'#.#######.#####.#####.###.#.#.#######.#.#',
-'#.#.....#.......#...#.#...#.#.....#.#.#.#',
-'#.#.###.#########.#.#.#.###.#####.#.#.#.#',
-'#...#.#.#...#.....#...#.#..@#.....#...#.#',
-'#.###.#.#.#.#.#########.#####.#####.###.#',
-'#.....#...#.........#...#...#.....#.#...#',
-' ####.#### ########.#.###.#.#.###.#.###.#',
-'#.........#.....#...#.#...#.#...#.#.#...#',
-'#.#########.###.#.###.#.###.#####.#.#.#.#',
-'#.#.......#.#.#.#.....#...#.......#...#.#',
-' ##.#####.#.#.#.#######.#.######## ####.#',
-'#...#...#.#...#.......#.#.........#...#.#',
-'#.#####.#.###.#######.#####.#####.#.###.#',
-'#.#...#.#.....#.....#.#...#...#.#.#.....#',
-'#.#.#.#.#######.###.#.#.#.###.#.#.######',
-'#.#.#.....#.#...#.#.#.#.#.#.....#.#.....#',
-'#.#.#####.#.#.###.#.###.#.#####.#.#.###.#',
-'#.#.#.....#.......#.....#.....#.#...#...#',
-'#.#.#.#################.#####.#.#####.#.#',
-'#...#...#.............#.#.....#.#...#.#.#',
-' ### ##.#.#.#########.#.#.#######.#.#.#.#',
-'#...#...#.#.#.....#.#...#...#.....#...#.#',
-'#.###.#####.#.###.#.#######.###.#.#####.#',
-'#...#.#.....#.#...#...#.....#...#.#...#.#',
-' ##.#.#.#####.#.#####.#.#####.#####.#.##',
-'#...#.#.#.....#.#.....#.....#.......#...#',
-'#.###.#.#.#####.#.###.#####.#.#########.#',
-'#...#...#.#.....#.#...#.....#.#...#.....#',
-' ##.#####.#####.#.#.###.#####.###.#.###.#',
-'#...#.....#...#...#...#.#.........#.#...#',
-'#.###.###.#.#.#### ##.#.#.#########.#.##',
-'#.....#.#.#.#.....#...#.#...#.....#.#.#.#',
-'#.#####O#.#.#####.#####.#####.###.#.#.#.#',
-'#.......#.......#.............#.....#...#',
-' ####### ####### ############# ##### ###'];
+// areaMap = [' ############### ### ########### #######',
+// '#...............#...#...........#.......#',
+// '#.#.###########.###.#.#.#########.#.####',
+// '#.#.....#...#.#.....#.#...........#.....#',
+// ' ######.#.#.#.#####.#.#################.#',
+// '#.......#.#...#.....#.#.....#.........#.#',
+// '#.#######.#####.#####.###.#.#.#######.#.#',
+// '#.#.....#.......#...#.#...#.#.....#.#.#.#',
+// '#.#.###.#########.#.#.#.###.#####.#.#.#.#',
+// '#...#.#.#...#.....#...#.#..@#.....#...#.#',
+// '#.###.#.#.#.#.#########.#####.#####.###.#',
+// '#.....#...#.........#...#...#.....#.#...#',
+// ' ####.#### ########.#.###.#.#.###.#.###.#',
+// '#.........#.....#...#.#...#.#...#.#.#...#',
+// '#.#########.###.#.###.#.###.#####.#.#.#.#',
+// '#.#.......#.#.#.#.....#...#.......#...#.#',
+// ' ##.#####.#.#.#.#######.#.######## ####.#',
+// '#...#...#.#...#.......#.#.........#...#.#',
+// '#.#####.#.###.#######.#####.#####.#.###.#',
+// '#.#...#.#.....#.....#.#...#...#.#.#.....#',
+// '#.#.#.#.#######.###.#.#.#.###.#.#.######',
+// '#.#.#.....#.#...#.#.#.#.#.#.....#.#.....#',
+// '#.#.#####.#.#.###.#.###.#.#####.#.#.###.#',
+// '#.#.#.....#.......#.....#.....#.#...#...#',
+// '#.#.#.#################.#####.#.#####.#.#',
+// '#...#...#.............#.#.....#.#...#.#.#',
+// ' ### ##.#.#.#########.#.#.#######.#.#.#.#',
+// '#...#...#.#.#.....#.#...#...#.....#...#.#',
+// '#.###.#####.#.###.#.#######.###.#.#####.#',
+// '#...#.#.....#.#...#...#.....#...#.#...#.#',
+// ' ##.#.#.#####.#.#####.#.#####.#####.#.##',
+// '#...#.#.#.....#.#.....#.....#.......#...#',
+// '#.###.#.#.#####.#.###.#####.#.#########.#',
+// '#...#...#.#.....#.#...#.....#.#...#.....#',
+// ' ##.#####.#####.#.#.###.#####.###.#.###.#',
+// '#...#.....#...#...#...#.#.........#.#...#',
+// '#.###.###.#.#.#### ##.#.#.#########.#.##',
+// '#.....#.#.#.#.....#...#.#...#.....#.#.#.#',
+// '#.#####O#.#.#####.#####.#####.###.#.#.#.#',
+// '#.......#.......#.............#.....#...#',
+// ' ####### ####### ############# ##### ###'];
 
-areaMap = areaMap.map((row) => row.replace('@', '.'));
-let nextAreaMap = areaMap.slice();
-
-let countEmptySpace = Infinity;
 let minutes = 0;
-while (countEmptySpace !== 0) {
-  nextAreaMap = areaMap.slice();
+(async function() {
 
-  areaMap.forEach((row,r) => {
-    row.split('').forEach((cell,c) => {
-      if (cell === 'O') {
-        if (areaMap[r-1] && areaMap[r-1].charAt(c) === '.') nextAreaMap[r-1] = nextAreaMap[r-1].slice(0,c)+'O'+nextAreaMap[r-1].slice(c+1);
-        if (areaMap[r+1] && areaMap[r+1].charAt(c) === '.') nextAreaMap[r+1] = nextAreaMap[r+1].slice(0,c)+'O'+nextAreaMap[r+1].slice(c+1);
-        if (areaMap[r].charAt(c-1) === '.') nextAreaMap[r] = nextAreaMap[r].slice(0,c-1)+'O'+nextAreaMap[r].slice(c-1 +1);
-        if (areaMap[r].charAt(c+1) === '.') nextAreaMap[r] = nextAreaMap[r].slice(0,c+1)+'O'+nextAreaMap[r].slice(c+1 +1);
-      }
+
+  areaMap = areaMap.map((row) => row.replace('@', '.'));
+  let nextAreaMap = areaMap.slice();
+
+  let countEmptySpace = Infinity;
+  while (countEmptySpace !== 0) {
+    nextAreaMap = areaMap.slice();
+
+    areaMap.forEach((row,r) => {
+      row.split('').forEach((cell,c) => {
+        if (cell === 'O') {
+          if (areaMap[r-1] && areaMap[r-1].charAt(c) === '.') nextAreaMap[r-1] = nextAreaMap[r-1].slice(0,c)+'O'+nextAreaMap[r-1].slice(c+1);
+          if (areaMap[r+1] && areaMap[r+1].charAt(c) === '.') nextAreaMap[r+1] = nextAreaMap[r+1].slice(0,c)+'O'+nextAreaMap[r+1].slice(c+1);
+          if (areaMap[r].charAt(c-1) === '.') nextAreaMap[r] = nextAreaMap[r].slice(0,c-1)+'O'+nextAreaMap[r].slice(c-1 +1);
+          if (areaMap[r].charAt(c+1) === '.') nextAreaMap[r] = nextAreaMap[r].slice(0,c+1)+'O'+nextAreaMap[r].slice(c+1 +1);
+        }
+      });
     });
-  });
-  areaMap = nextAreaMap;
+    areaMap = nextAreaMap;
 
-  countEmptySpace = areaMap.reduce((tally, row) => {
-    return tally+row.split('.').length-1;
-  }, 0);
-  minutes++;
+    countEmptySpace = areaMap.reduce((tally, row) => {
+      return tally+row.split('.').length-1;
+    }, 0);
+    minutes++;
 
+    // await sleep(100);
 
-  // let lastScreen = '\n';
-  // for (let r = 0; r < areaMap.length; r++) {
-  //   if (areaMap[r] === undefined) { areaMap[r] = ''; }
-  //   lastScreen += `Row ${r}`.padStart(6, ' ') + ' ' + areaMap[r] + '\n';
-  // }
-  // console.log(lastScreen);
-}
-
-
-let lastScreen = '\n';
-for (let r = 0; r < areaMap.length; r++) {
-  if (areaMap[r] === undefined) { areaMap[r] = ''; }
-  lastScreen += `Row ${r}`.padStart(6, ' ') + ' ' + areaMap[r] + '\n';
-}
-console.log(lastScreen);
-
-console.log(`Day 15 - Part 2: ${minutes} minutes to fill space`); // 343 minutes is too low??? 344!! (off-by-one guessed, lol)
+    // let lastScreen = '\n';
+    // for (let r = 0; r < areaMap.length; r++) {
+    //   if (areaMap[r] === undefined) { areaMap[r] = ''; }
+    //   lastScreen += `Row ${r}`.padStart(6, ' ') + ' ' + areaMap[r] + '\n';
+    // }
+    // console.log(lastScreen);
+  }
 
 
+  let lastScreen = '\n';
+  for (let r = 0; r < areaMap.length; r++) {
+    if (areaMap[r] === undefined) { areaMap[r] = ''; }
+    lastScreen += `Row ${r}`.padStart(6, ' ') + ' ' + areaMap[r] + '\n';
+  }
+  console.log(lastScreen);
 
-function sleep(millis: number) {
-  return new Promise(resolve => setTimeout(resolve, millis));
-}
+  console.log(`Day 15 - Part 2: ${minutes} minutes to fill space`); // 343 minutes is too low??? 344!! (off-by-one guessed, lol)
+
+})();
+
+
+
+// function sleep(millis: number) {
+//   return new Promise(resolve => setTimeout(resolve, millis));
+// }
