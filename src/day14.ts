@@ -11,7 +11,7 @@ type Reactant = {
   amount: number;
 }
 
-const reactions: {[product: string]: Reaction} = fs.readFileSync('input/day14.test', 'utf-8')
+const reactions: {[product: string]: Reaction} = fs.readFileSync('input/day14.input', 'utf-8')
   .trim()
   .split('\n')
   .reduce((reactionMap: {[product: string]: Reaction}, reactionStr) => {
@@ -41,15 +41,14 @@ const reactions: {[product: string]: Reaction} = fs.readFileSync('input/day14.te
 
 // console.log(reactions);
 
-let primaryFuelRequirements: any = {};
+// let primaryFuelRequirements: any = {};
 let leftoverCompound: any = {};
 
 function getPrimaryFuelRequirements(compound: string, amount: number): number {
-  console.log(`Finding ore requirement for ${amount} ${compound}`);
-
   if (compound === 'ORE') {
     return amount;
   }
+  // console.log(`Finding ore requirement for ${amount} ${compound}`);
   const reaction = reactions[compound];
   const reactants = reaction.reactants;
   // if (reactants.length === 1 && reactants[0].name === 'ORE') {
@@ -61,22 +60,31 @@ function getPrimaryFuelRequirements(compound: string, amount: number): number {
   // }
 
   let oreNeeded = 0;
-  for (let r = 0; r < reactants.length; r++) {
-    // const currentProductAmountWithLeftover = amount + (leftoverCompound[compound] || 0)
-    const numReactionsNeeded = Math.ceil(amount / reaction.productAmount);
-    const reactantAmountNeeded = numReactionsNeeded * reactants[r].amount;
-    leftoverCompound[reactants[r].name] = 0;
 
-    const leftoverProductAmount = numReactionsNeeded * reaction.productAmount - amount
-    leftoverCompound[compound] = leftoverCompound[compound] === undefined
-      ? leftoverProductAmount
-      : leftoverCompound[compound] + leftoverProductAmount;
-    console.log(leftoverCompound);
+  const productNeededAfterUsingLeftover = amount // (leftoverCompound[compound] || 0);
+  let numReactionsNeeded = Math.ceil(productNeededAfterUsingLeftover / reaction.productAmount);
+
+
+  leftoverCompound[compound] = leftoverCompound[compound] === undefined
+    ? numReactionsNeeded*reaction.productAmount - amount
+    : leftoverCompound[compound] + numReactionsNeeded*reaction.productAmount - amount;
+
+  if (leftoverCompound[compound] >= reaction.productAmount) {
+    // console.log('Have extra product! **&Q938E #Q(R* SA(*');
+    numReactionsNeeded--;
+    leftoverCompound[compound] -= reaction.productAmount;
+  }
+
+  for (let r = 0; r < reactants.length; r++) {
+    // leftoverCompound[compound] = 0;
+
+    // console.log(`${numReactionsNeeded} reactions needed to create ${productNeededAfterUsingLeftover} ${compound}`);
+    const reactantAmountNeeded = numReactionsNeeded * reactants[r].amount;
 
     // primaryFuelRequirements[reactants[r].name] = primaryFuelRequirements[reactants[r].name]
     //   ? primaryFuelRequirements[reactants[r].name] + amount
     //   : amount;
-
+    // console.log(leftoverCompound);
     oreNeeded += getPrimaryFuelRequirements(reactants[r].name, reactantAmountNeeded);
   }
 
@@ -92,8 +100,13 @@ const oreRequirements = getPrimaryFuelRequirements('FUEL', 1);
 //   return ore + compoundOreRequirement;
 // }, 0);
 
-console.log(`Day 14 - Part 1: ${oreRequirements} ore needed`); // 264032382979 too high
+console.log(`Day 14 - Part 1: ${oreRequirements} ore needed`); // 248794!!
 // 610210 also too high??
 // test is wrong: 182966
-console.log(primaryFuelRequirements);
-console.log(leftoverCompound);
+
+const maxFuelPossible = 4906796;
+const part2OreForFuel = getPrimaryFuelRequirements('FUEL', maxFuelPossible);
+console.log(`Day 14 - Part 2: ${part2OreForFuel} ore for ${maxFuelPossible}`); // 4019390 too low, 4906796 is the right answer
+
+// console.log(primaryFuelRequirements);
+// console.log(leftoverCompound);
